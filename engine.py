@@ -11,8 +11,7 @@ async def start():
     player.instance = ape.instances[
         interface.ask_user_choice([
             a.view() for a in ape.instances
-            ]
-        )
+        ])
     ]
     
     

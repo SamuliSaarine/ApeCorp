@@ -23,4 +23,8 @@ OPENAI_API_KEY=your_openai_api_key
 
 ```bash
 python -m main
+
+```or 
+
+pkill -f "python.*main" || true && sleep 1 && cd /workspaces/ApeCorp && python -m main
 ```
