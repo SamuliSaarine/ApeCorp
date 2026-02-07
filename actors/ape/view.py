@@ -1,7 +1,4 @@
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from . import Ape
+from __future__ import annotations
 
 def view(ape: Ape):
     return f"""Name: {ape.name}

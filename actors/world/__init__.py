@@ -9,7 +9,7 @@ instance = None
 
 class World(CreateWorld, Entity):
     @staticmethod
-    async def generate(selector: Callable[[list[InterfaceType]], int]) -> World:
+    async def generate(selector: Callable[[list[InterfaceType]], int]) -> "World":
         global instance
         assert instance is None, "World already generated"
         worlds = await create_worlds()

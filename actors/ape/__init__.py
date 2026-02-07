@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .agent import create_apes
 from .models import CreateApe, Personality
 from pydantic_world import Entity
