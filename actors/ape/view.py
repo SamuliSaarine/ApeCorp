@@ -11,6 +11,6 @@ Role: {ape.role}
 Facts: {', '.join(ape.facts)}
 Opinions: {', '.join(ape.opinions)}
 Personality: {ape.personality}
-Relationships: {', '.join(ape.relationships)}
+Relationships: {', '.join([f'{k}: {v}' for k, v in ape.relationships.items()])}
 Memory: {', '.join(ape.log[-10:])}
 """

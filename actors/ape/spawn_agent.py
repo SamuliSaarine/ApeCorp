@@ -3,7 +3,7 @@ from .models import CreateApe, Personality
 from pydantic_world import load_md, get_model
 from actors import world, tribe
 
-_system_prompt = load_md("actors/ape/system_prompt.md")
+_system_prompt = load_md("actors/ape/spawn_prompt.md")
 
 _create_agent = Agent(
     model=get_model("creative"),

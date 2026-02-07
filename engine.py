@@ -1,6 +1,7 @@
 from actors.world import World
 from actors.tribe import Tribe
 from actors.ape import Ape
+from actors.player import Player
 from actors import player, ape
 import interface
 import asyncio
@@ -29,10 +30,15 @@ async def print_mode(player, exit_event):
     player.instance.unsubscribe(callback)
 
 async def start():
+    print("Starting simulation...")
     await World.generate(interface.ask_user_choice)
+    print("World generated.")
     await Tribe.generate(interface.ask_user_choice)
+    print("Tribe generated.")
     await Ape.generate()
-    player.instance = random.choice(ape.instances)
+    print(f"{len(ape.instances)} Apes generated.")
+    player.instance = Player(random.choice(list(ape.instances.values())))
+    print(f"Player is {player.instance.ape.name}")
     pause = True
     while player.instance:
         if pause:
@@ -41,9 +47,11 @@ async def start():
             # Start the input waiter in the background
             input_task = asyncio.create_task(get_input(""))
             
+            print_task = asyncio.create_task(print_mode(player, exit_signal))
+            
             # Run the listener until the input_task completes
             done, pending = await asyncio.wait(
-                [input_task, print_mode(player, exit_signal)],
+                [input_task, print_task],
                 return_when=asyncio.FIRST_COMPLETED
             )
             

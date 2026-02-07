@@ -1,10 +1,10 @@
 from pydantic_world import Entity
 from typing import Callable
-from ape import Ape
+from actors.ape import Ape
 
 instance = None
 
-class Player(Entity):
+class Player():
     ape: Ape
     
     def __init__(self, ape: Ape):
