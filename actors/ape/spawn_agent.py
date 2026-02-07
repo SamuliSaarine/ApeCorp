@@ -5,7 +5,7 @@ from actors import world, tribe
 
 _system_prompt = load_md("actors/ape/system_prompt.md")
 
-agent = Agent(
+_create_agent = Agent(
     model=get_model("creative"),
     output_type=list[CreateApe],
     system_prompt=_system_prompt
@@ -35,5 +35,5 @@ async def create_apes(personalities: list[Personality]) -> list[CreateApe]:
 
         """
 
-    result = await agent.run(prompt)
+    result = await _create_agent.run(prompt)
     return result.output

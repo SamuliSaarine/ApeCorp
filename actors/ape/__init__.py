@@ -1,14 +1,18 @@
-from .agent import create_apes
+from .spawn_agent import create_apes
 from .models import CreateApe, Personality
 from pydantic_world import Entity
 from actors import world, tribe
 import random
 from .view import view as _view
+from typing import Callable, Set
 
 instances: list[Ape] = []
 
 class Ape(CreateApe, Entity):
     personality: Personality
+    log: list[str] = []
+    listeners: Set[Callable[[str], None]] = set()
+    waiting_to_act: bool = False
     
     @staticmethod
     async def generate() -> list[Ape]:
@@ -41,3 +45,21 @@ class Ape(CreateApe, Entity):
 
     def view(self) -> str:
         return _view(self)
+
+    def subscribe(self, callback: Callable[[str], None]):
+        self.listeners.add(callback)
+
+    def unsubscribe(self, callback: Callable[[str], None]):
+        self.listeners.remove(callback)
+
+    def message(self, sender: str, message: str):
+        if sender == "MYSELF":
+            self.log.append(f"[I thought]: {message}")
+            act()
+        else:
+            self.log.append(f"[{sender} said]: {message}")
+            for listener in self.listeners:
+                listener(f"[{sender}]: {message}")
+            act()
+
+    def act(self):
