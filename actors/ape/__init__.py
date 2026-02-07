@@ -1,32 +1,22 @@
 from .agent import create_apes
 from .models import CreateApe, Personality
 from pydantic_world import Entity
-import actors.world
-import actors.tribe
+from actors import world, tribe
 import random
+from .view import view as _view
 
-instances: list['Ape'] = []
+instances: list[Ape] = []
 
 class Ape(CreateApe, Entity):
-    def __init__(self, ape: CreateApe, personality: Personality):
-        self.name = ape.name
-        self.age = ape.age
-        self.gender = ape.gender
-        self.role = ape.role
-        self.facts = ape.facts
-        self.opinions = ape.opinions
-        self.personality = personality
-
+    personality: Personality
+    
     @staticmethod
-    async def generate() -> list['Ape']:
+    async def generate() -> list[Ape]:
         global instances
         
-        world = actors.world.instance
-        tribe = actors.tribe.instance
-        
-        if world is None:
+        if world.instance is None:
             raise ValueError("World instance is not generated yet.")
-        if tribe is None:
+        if tribe.instance is None:
             raise ValueError("Tribe instance is not generated yet.")
 
         personalities = []
@@ -43,8 +33,11 @@ class Ape(CreateApe, Entity):
         
         new_apes = []
         for i, ape_data in enumerate(created_apes):
-            new_ape = Ape(ape_data, personalities[i])
+            new_ape = Ape(**ape_data.model_dump(), personality=personalities[i])
             new_apes.append(new_ape)
             
         instances = new_apes
         return instances
+
+    def view(self) -> str:
+        return _view(self)

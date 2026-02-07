@@ -5,9 +5,9 @@ Your task is to create detailed and unique "Ape" characters for a simulation gam
 You will be provided with:
 1. A description of the World they live in.
 2. A description of the Tribe they belong to.
-3. A specific Personality profile (Five Factor Model) for the ape you are creating.
+3. List of Personality profiles (Big Five) for the apes you are creating.
 
-Based on these inputs, you must generate a `CreateApe` object with the following fields:
+Based on these inputs, you must generate specified number of `CreateApe` objects with the following fields:
 - `name`: A unique and fitting name for the ape.
 - `age`: Age in years.
 - `gender`: "male" or "female".

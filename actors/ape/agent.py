@@ -1,42 +1,39 @@
-from utils.get_model import get_model
 from pydantic_ai import Agent
 from .models import CreateApe, Personality
-import actors.world
-import actors.tribe
-from pydantic_world import load_md
+from pydantic_world import load_md, get_model
+from actors import world, tribe
 
 _system_prompt = load_md("actors/ape/system_prompt.md")
 
 agent = Agent(
     model=get_model("creative"),
-    output_type=CreateApe,
+    output_type=list[CreateApe],
     system_prompt=_system_prompt
 )
 
 async def create_apes(personalities: list[Personality]) -> list[CreateApe]:
-    world = actors.world.instance
-    tribe = actors.tribe.instance
-    
-    if world is None or tribe is None:
+    if world.instance is None or tribe.instance is None:
         raise ValueError("World and Tribe must be generated before creating Apes.")
 
-    apes = []
-    for personality in personalities:
-        prompt = f"""
+    prompt = f"""
         World Description:
-        {world.view()}
+        {world.instance.view()}
 
         Tribe Description:
-        {tribe.view()}
+        {tribe.instance.view()}
 
-        Target Personality:
-        Openness: {personality.openness}/100
-        Conscientiousness: {personality.conscientiousness}/100
-        Extraversion: {personality.extraversion}/100
-        Agreeableness: {personality.agreeableness}/100
-        Neuroticism: {personality.neuroticism}/100
+        Generate {len(personalities)} apes with the following personalities:
         """
-        result = await agent.run(prompt)
-        apes.append(result.data)
-    
-    return apes
+    for i, p in enumerate(personalities):
+        prompt += f"""
+        Target Personality {i+1}:
+        Openness: {p.openness}/100
+        Conscientiousness: {p.conscientiousness}/100
+        Extraversion: {p.extraversion}/100
+        Agreeableness: {p.agreeableness}/100
+        Neuroticism: {p.neuroticism}/100
+
+        """
+
+    result = await agent.run(prompt)
+    return result.output

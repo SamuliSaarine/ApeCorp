@@ -12,7 +12,7 @@ _creator = Agent(
 )
 
 async def create_worlds() -> list[CreateWorld]:
-    genOptions = os.getenv("CUSTOM_SETUP", 0)
+    genOptions = int(os.getenv("CUSTOM_SETUP", 0))
     prompt = f"""
     Generate {3 if genOptions else 1} world option{'s' if genOptions else ''}.
     """
