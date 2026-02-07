@@ -7,4 +7,7 @@ Gender: {ape.gender}
 Role: {ape.role}
 Facts: {', '.join(ape.facts)}
 Opinions: {', '.join(ape.opinions)}
-Personality: {ape.personality}"""
+Personality: {ape.personality}
+Relationships: {', '.join([f'{k}: {v}' for k, v in ape.relationships.items()])}
+Memory: {', '.join(ape.log[-10:])}
+"""

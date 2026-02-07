@@ -1,3 +1,6 @@
+# Python version
+This project requires Python 3.14 or higher.
+
 # Install dependencies:
 
 ```bash

@@ -5,7 +5,7 @@ MODELS = {
     "MISTRAL": {
         "FAST": {
             "creative": "mistral:labs-mistral-small-creative",
-            "action": "mistral-small-2506"
+            "action": "mistral:mistral-small-latest"
         }
     }
 }

@@ -1,0 +1,1 @@
+Do actions according to current situation and your personality.

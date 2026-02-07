@@ -15,3 +15,4 @@ class CreateApe(BaseModel):
     role: str
     facts: list[str]
     opinions: list[str]
+    relationships: dict[str, str]
