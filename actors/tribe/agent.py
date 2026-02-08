@@ -6,13 +6,19 @@ import os
 
 _system_prompt = load_md("actors/tribe/system_prompt.md")
 
-_agent = Agent(
-    model=get_model("creative"),
-    output_type=list[CreateTribe],
-    system_prompt=_system_prompt
-)
+# _agent = Agent(
+#     model=get_model("creative"),
+#     output_type=list[CreateTribe],
+#     system_prompt=_system_prompt
+# )
 
 async def create_tribes() -> list[CreateTribe]:
+    agent = Agent(
+        model=get_model("creative"),
+        output_type=list[CreateTribe],
+        system_prompt=_system_prompt
+    )
+
     if world.instance is None:
         raise ValueError("World instance is not generated yet.")
     genOptions = int(os.getenv("CUSTOM_SETUP", 0))
@@ -22,6 +28,6 @@ async def create_tribes() -> list[CreateTribe]:
     World Description:
     {world.instance.view()}
     """
-    results = await _agent.run(prompt)
+    results = await agent.run(prompt)
     return results.output
         

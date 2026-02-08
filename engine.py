@@ -4,62 +4,58 @@ from actors.ape import Ape
 from actors.player import Player
 from actors import player, ape
 import interface
-import asyncio
 import random
+from fasthtml.common import Div, fast_app
+import uvicorn
 
-async def get_input(prompt):
-    """Non-blocking wrapper for input."""
-    return await asyncio.get_event_loop().run_in_executor(None, input, prompt)
+# FastHTML App Setup
+app, rt = fast_app()
 
-async def print_mode(player, exit_event):
-    """
-    Subscribes to messages and waits for the exit_event to be set.
-    """
+@rt('/')
+def get():
+    # Helper to render the full app via interface
+    return interface.render_app(player.instance)
 
-    def callback(msg):
-        print(f"\r{msg}\n> ", end="")
-    # Subscribe and define what to do with messages
-    player.instance.subscribe(callback)
-    
-    print("--- Entered PRINT MODE (Press Enter to stop) ---")
-    
-    # We wait here without blocking the rest of the program
-    await exit_event.wait() 
-    
-    # Cleanup subscription so it doesn't print during Whisper Mode
-    player.instance.unsubscribe(callback)
+@rt('/whisper')
+async def post(msg: str):
+    if player.instance:
+        player.instance.message(msg)
+        return interface.render_log(f"You whispered: {msg}")
+    return interface.render_log("Error: Player not initialized")
+
+@rt('/log_updates')
+def log_updates():
+    if player.instance:
+        # Get last 20 lines of log
+        recent_logs = player.instance.ape.log[-20:]
+        # Wrap in a fragment or Div to ensure it renders correctly as a list of elements
+        return Div(*[interface.render_log(msg) for msg in recent_logs])
+    return interface.render_log("Waiting for player initialization...")
+
+# We could have a separate endpoint for polling info updates or another WS
+@rt('/info/{section}')
+async def info_updates(section: str):
+    if player.instance:
+        return interface.render_info_content(player.instance, section)
+    return interface.render_info_content(None, section)
 
 async def start():
     print("Starting simulation...")
+    # Initialize the world
     await World.generate(interface.ask_user_choice)
     print("World generated.")
     await Tribe.generate(interface.ask_user_choice)
     print("Tribe generated.")
     await Ape.generate()
     print(f"{len(ape.instances)} Apes generated.")
+    
+    # Select player
     player.instance = Player(random.choice(list(ape.instances.values())))
     print(f"Player is {player.instance.ape.name}")
-    pause = True
-    while player.instance:
-        if pause:
-            exit_signal = asyncio.Event()
-            
-            # Start the input waiter in the background
-            input_task = asyncio.create_task(get_input(""))
-            
-            print_task = asyncio.create_task(print_mode(player, exit_signal))
-            
-            # Run the listener until the input_task completes
-            done, pending = await asyncio.wait(
-                [input_task, print_task],
-                return_when=asyncio.FIRST_COMPLETED
-            )
-            
-            # Tell the listener to stop and clean up
-            exit_signal.set()
-        else:
-            msg = await get_input("Whisper: ")
-            player.instance.message(msg)
-            
-        pause = not pause
     
+    print("Starting Web Server at http://0.0.0.0:5001")
+    
+    # Run Uvicorn Server
+    config = uvicorn.Config(app, host='0.0.0.0', port=5001, log_level="info")
+    server = uvicorn.Server(config)
+    await server.serve()
